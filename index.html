@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEFL 打字练习系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --text-correct: #e2b714;
+            --text-incorrect: #e74c3c;
+            --text-current: #ffffff;
+            --text-pending: #646464;
+            --border-color: #3a3a3a;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --error: #e74c3c;
+            --card-bg: rgba(30, 30, 30, 0.9);
+            --transition: all 0.3s ease;
+            --accent: #3498db;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: linear-gradient(135deg, rgba(40,40,40,0.8) 0%, rgba(30,30,30,0.9) 100%), 
+                              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231a1a1a"/><path d="M20,20 L80,80 M80,20 L20,80" stroke="%232a2a2a" stroke-width="2"/></svg>');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-primary);
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-correct);
+        }
+        
+        .logo i {
+            color: var(--text-correct);
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+        
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .category-view {
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .category-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: center;
+            height: 100%;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--text-correct);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .category-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .category-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-correct);
+        }
+        
+        .category-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .practice-view {
+            width: 100%;
+            max-width: 900px;
+            display: none;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-correct);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .typing-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .text-display {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            min-height: 200px;
+            padding: 20px;
+            background: rgba(40,40,40,0.4);
+            border-radius: 8px;
+            overflow-wrap: break-word;
+        }
+        
+        .char {
+            transition: color 0.1s ease;
+            position: relative;
+        }
+        
+        .char.correct {
+            color: var(--text-correct);
+        }
+        
+        .char.incorrect {
+            color: var(--text-incorrect);
+            text-decoration: underline;
+        }
+        
+        .char.current {
+            background-color: rgba(226, 183, 20, 0.2);
+            border-radius: 3px;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        #typingInput {
+            flex: 1;
+            padding: 15px 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        #typingInput:focus {
+            border-color: var(--text-correct);
+            box-shadow: 0 0 0 3px rgba(226, 183, 20, 0.3);
+        }
+        
+        .action-button {
+            padding: 15px 25px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .action-button:hover {
+            background: var(--text-correct);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+        
+        .action-button.reset {
+            background: var(--error);
+        }
+        
+        .action-button.reset:hover {
+            background: #c0392b;
+        }
+        
+        .results-view {
+            width: 100%;
+            max-width: 700px;
+            display: none;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+        
+        .results-view h2 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: var(--text-correct);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .result-stat {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .result-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .result-stat .value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .result-stat.wpm .value {
+            color: var(--text-correct);
+        }
+        
+        .result-stat.accuracy .value {
+            color: var(--success);
+        }
+        
+        .result-stat.time .value {
+            color: var(--warning);
+        }
+        
+        .result-stat.errors .value {
+            color: var(--error);
+        }
+        
+        .result-stat .label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        footer {
+            padding: 30px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--text-correct);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .exercise-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--text-correct);
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .exercise-info {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            padding: 0 10px;
+        }
+        
+        .hint {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            border-left: 4px solid var(--text-correct);
+        }
+        
+        .hint i {
+            color: var(--text-correct);
+            margin-right: 8px;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            font-size: 3rem;
+            color: var(--text-correct);
+            margin-bottom: 20px;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            padding: 20px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 8px;
+            color: var(--error);
+            margin-top: 20px;
+            text-align: center;
+            border-left: 4px solid var(--error);
+        }
+        
+        .deployment-guide {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .deployment-guide h2 {
+            color: var(--text-correct);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .deployment-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: var(--text-correct);
+            color: var(--bg-primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .json-structure {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .json-key {
+            color: var(--text-correct);
+        }
+        
+        .json-string {
+            color: var(--success);
+        }
+        
+        .json-comment {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .results-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .typing-container {
+                padding: 25px 15px;
+            }
+            
+            .text-display {
+                font-size: 1.3rem;
+            }
+            
+            .input-area {
+                flex-direction: column;
+            }
+            
+            #typingInput {
+                width: 100%;
+            }
+            
+            .action-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            nav ul {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-keyboard"></i>
+                    <span>TOEFL 打字练习</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="active" id="navHome">首页</a></li>
+                        <li><a href="#" id="navPractice">练习</a></li>
+                        <li><a href="#" id="navResults">成绩</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <div class="category-view" id="categoryView">
+                <h1 class="exercise-title">选择练习类别</h1>
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px;">
+                    选择您想练习的TOEFL类别，提升您的英语打字速度和准确率
+                </p>
+                
+                <div class="category-grid">
+                    <div class="category-card" data-category="listening">
+                        <div class="category-icon">
+                            <i class="fas fa-headphones"></i>
+                        </div>
+                        <h3>听力练习</h3>
+                        <p>通过听力原文练习，提高听力理解能力的同时提升打字速度。包含各种学术讲座和对话内容。</p>
+                    </div>
+                    
+                    <div class="category-card" data-category="reading">
+                        <div class="category-icon">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <h3>阅读练习</h3>
+                        <p>练习学术文章打字，增强阅读理解能力。内容涵盖科学、历史、艺术等多个领域。</p>
+                    </div>
+                    
+                    <div class="category-card" data-category="speaking">
+                        <div class="category-icon">
+                            <i class="fas fa-microphone"></i>
+                        </div>
+                        <h3>口语练习</h3>
+                        <p>通过口语回答练习，提升思维组织与表达速度。包含独立口语和综合口语题目。</p>
+                    </div>
+                    
+                    <div class="category-card" data-category="writing">
+                        <div class="category-icon">
+                            <i class="fas fa-pencil-alt"></i>
+                        </div>
+                        <h3>写作练习</h3>
+                        <p>练习学术写作表达，提高写作流畅度。包含综合写作和独立写作范文。</p>
+                    </div>
+                </div>
+                
+                <div class="hint">
+                    <i class="fas fa-lightbulb"></i>
+                    提示：选择类别后，系统将随机加载该类别下的文章。开始输入时计时器会自动启动。
+                </div>
+                
+                <div class="deployment-guide">
+                    <h2><i class="fas fa-rocket"></i> GitHub部署指南</h2>
+                    
+                    <div class="deployment-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div>
+                                <strong>创建GitHub仓库</strong>
+                                <p>登录GitHub → 点击"New repository" → 命名为"toefl-typing-practice" → 选择Public → 添加README文件</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div>
+                                <strong>上传文件</strong>
+                                <p>克隆仓库 → 添加index.html文件 → 创建data目录 → 添加JSON练习文件 → 提交并推送更改</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div>
+                                <strong>启用GitHub Pages</strong>
+                                <p>仓库设置 → Pages → 选择main分支 → 保存后访问 https://&lt;用户名&gt;.github.io/toefl-typing-practice</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>JSON练习文件格式</h3>
+                    <div class="json-structure">
+                        <span class="json-key">[</span><br>
+                        &nbsp;&nbsp;<span class="json-key">{</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id":</span> <span class="json-string">"listening-001"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"title":</span> <span class="json-string">"生物学讲座"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"text":</span> <span class="json-string">"Today we'll discuss photosynthesis..."</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"difficulty":</span> <span class="json-string">"中级"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"source":</span> <span class="json-string">"TOEFL Listening Practice"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"vocabulary":</span> [<span class="json-string">"photosynthesis"</span>, <span class="json-string">"chloroplasts"</span>]<br>
+                        &nbsp;&nbsp;<span class="json-key">}</span>,<br>
+                        &nbsp;&nbsp;<span class="json-key">{</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id":</span> <span class="json-string">"listening-002"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"title":</span> <span class="json-string">"艺术史讲座"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"text":</span> <span class="json-string">"The Renaissance period marked..."</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"difficulty":</span> <span class="json-string">"高级"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"source":</span> <span class="json-string">"TOEFL Listening Practice"</span><br>
+                        &nbsp;&nbsp;<span class="json-key">}</span><br>
+                        <span class="json-key">]</span><br>
+                        <span class="json-comment">// 每个JSON文件可包含多个练习文章</span>
+                    </div>
+                    
+                    <div class="hint">
+                        <i class="fas fa-folder-open"></i>
+                        目录结构: toefl-typing-practice/index.html 和 toefl-typing-practice/data/[category].json
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-view" id="practiceView">
+                <h1 class="exercise-title" id="exerciseTitle">听力练习</h1>
+                <div class="exercise-info">
+                    <span>难度: <span id="exerciseDifficulty">中级</span></span>
+                    <span>字数: <span id="wordCount">0</span> 词</span>
+                    <span>来源: <span id="exerciseSource">TOEFL Listening Practice</span></span>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value" id="wpmStat">0</div>
+                        <div class="stat-label">速度 (WPM)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="accuracyStat">100%</div>
+                        <div class="stat-label">准确率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="timerStat">00:00</div>
+                        <div class="stat-label">时间</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="errorsStat">0</div>
+                        <div class="stat-label">错误</div>
+                    </div>
+                </div>
+                
+                <div class="typing-container">
+                    <div class="text-display" id="textDisplay">
+                        <!-- 文章内容将通过JavaScript动态生成 -->
+                    </div>
+                    
+                    <div class="input-area">
+                        <input type="text" id="typingInput" placeholder="点击此处开始输入..." autocomplete="off">
+                        <button class="action-button reset" id="resetButton">
+                            <i class="fas fa-redo"></i> 重置
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="hint" id="vocabularyHint">
+                    <i class="fas fa-book"></i>
+                    重点词汇: <span id="vocabularyList">正在加载...</span>
+                </div>
+            </div>
+            
+            <div class="results-view" id="resultsView">
+                <h2><i class="fas fa-trophy"></i> 练习完成!</h2>
+                
+                <div class="results-stats">
+                    <div class="result-stat wpm">
+                        <div class="value" id="finalWpm">0</div>
+                        <div class="label">打字速度 (WPM)</div>
+                    </div>
+                    
+                    <div class="result-stat accuracy">
+                        <div class="value" id="finalAccuracy">100%</div>
+                        <div class="label">准确率</div>
+                    </div>
+                    
+                    <div class="result-stat time">
+                        <div class="value" id="finalTime">00:00</div>
+                        <div class="label">用时</div>
+                    </div>
+                    
+                    <div class="result-stat errors">
+                        <div class="value" id="finalErrors">0</div>
+                        <div class="label">错误数</div>
+                    </div>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="action-button" id="retryButton">
+                        <i class="fas fa-redo"></i> 重试
+                    </button>
+                    <button class="action-button" id="newExerciseButton">
+                        <i class="fas fa-random"></i> 新练习
+                    </button>
+                    <button class="action-button" id="backButton">
+                        <i class="fas fa-arrow-left"></i> 返回
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>TOEFL 打字练习系统 &copy; 2023 | 提升您的英语打字速度和准确率 | 设计用于GitHub Pages部署</p>
+        </div>
+    </footer>
+    
+    <script>
+        // 模拟从JSON加载的练习数据
+        const exercises = {
+            listening: [
+                {
+                    id: "listening-001",
+                    title: "生物学讲座",
+                    text: "Today we'll discuss photosynthesis, the process by which plants convert light energy into chemical energy. This complex biochemical process occurs in the chloroplasts of plant cells and involves two main stages: the light-dependent reactions and the Calvin cycle. Photosynthesis not only provides energy for the plant itself but also produces oxygen as a byproduct, which is essential for most living organisms on Earth.",
+                    difficulty: "中级",
+                    source: "TOEFL Listening Practice",
+                    vocabulary: ["photosynthesis", "chloroplasts", "biochemical", "Calvin cycle"]
+                },
+                {
+                    id: "listening-002",
+                    title: "艺术史讲座",
+                    text: "The Renaissance period marked a significant shift in European art and culture. Beginning in Italy during the 14th century, this movement emphasized humanism, realism, and classical influences. Artists like Leonardo da Vinci and Michelangelo created masterpieces that demonstrated remarkable technical skill and deep understanding of human anatomy. The invention of linear perspective during this time revolutionized how artists represented three-dimensional space on a two-dimensional surface.",
+                    difficulty: "高级",
+                    source: "TOEFL Listening Practice",
+                    vocabulary: ["Renaissance", "humanism", "anatomy", "perspective"]
+                }
+            ],
+            reading: [
+                {
+                    id: "reading-001",
+                    title: "气候变化的科学",
+                    text: "Climate change represents one of the most pressing environmental challenges of our time. Scientific evidence overwhelmingly indicates that Earth's climate is warming at an unprecedented rate, primarily due to human activities such as burning fossil fuels and deforestation. This warming leads to rising sea levels, more extreme weather events, and disruptions to ecosystems worldwide. Addressing climate change requires global cooperation and innovative solutions across multiple sectors.",
+                    difficulty: "高级",
+                    source: "TOEFL Reading Passage",
+                    vocabulary: ["unprecedented", "deforestation", "ecosystems", "innovation"]
+                },
+                {
+                    id: "reading-002",
+                    title: "蜜蜂的重要性",
+                    text: "Bees play a crucial role in global food production through pollination. Approximately one-third of the food we consume depends on pollination by bees and other insects. However, bee populations worldwide are declining due to factors including pesticide use, habitat loss, and climate change. This decline threatens agricultural productivity and biodiversity. Conservation efforts are essential to protect these vital pollinators and maintain ecosystem balance.",
+                    difficulty: "中级",
+                    source: "TOEFL Reading Passage",
+                    vocabulary: ["pollination", "pesticide", "biodiversity", "ecosystem"]
+                }
+            ],
+            speaking: [
+                {
+                    id: "speaking-001",
+                    title: "独立口语任务",
+                    text: "Some people believe that technology has made our lives easier and more convenient. Others argue that technology has created more problems than it has solved. Which view do you agree with? Use specific reasons and examples to support your answer. Personally, I believe technology has significantly improved our quality of life despite some challenges it presents.",
+                    difficulty: "中级",
+                    source: "TOEFL Speaking Task 2",
+                    vocabulary: ["technology", "convenience", "challenges", "innovation"]
+                },
+                {
+                    id: "speaking-002",
+                    title: "校园公告讨论",
+                    text: "The university has announced plans to replace all physical textbooks with digital versions within two years. The announcement states that this change will reduce costs for students and make learning materials more accessible. However, some students have expressed concerns about eye strain from prolonged screen time and potential technical issues. What is your opinion on this matter?",
+                    difficulty: "高级",
+                    source: "TOEFL Speaking Task 3",
+                    vocabulary: ["digital", "accessible", "technical", "prolonged"]
+                }
+            ],
+            writing: [
+                {
+                    id: "writing-001",
+                    title: "综合写作任务",
+                    text: "The reading passage discusses the potential benefits of vertical farming as a solution to food production challenges in urban areas. It claims that vertical farms use less water and land than traditional agriculture while reducing transportation costs. The lecture, however, challenges these arguments by pointing out the high energy consumption of artificial lighting and climate control systems required for vertical farms. Furthermore, the professor questions whether vertical farming can realistically produce staple crops in sufficient quantities to feed large urban populations.",
+                    difficulty: "高级",
+                    source: "TOEFL Writing Task 1",
+                    vocabulary: ["vertical farming", "agriculture", "consumption", "staple crops"]
+                },
+                {
+                    id: "writing-002",
+                    title: "教育观点讨论",
+                    text: "Do you agree or disagree with the following statement? The most important aspect of a job is the money a person earns. Use specific reasons and examples to support your answer. While financial compensation is undoubtedly important, I believe job satisfaction and work-life balance contribute more significantly to overall career fulfillment. People who find meaning in their work tend to be more productive and experience better mental health, regardless of their salary level.",
+                    difficulty: "中级",
+                    source: "TOEFL Writing Task 2",
+                    vocabulary: ["compensation", "fulfillment", "productive", "regardless"]
+                }
+            ]
+        };
+        
+        // DOM元素
+        const categoryView = document.getElementById('categoryView');
+        const practiceView = document.getElementById('practiceView');
+        const resultsView = document.getElementById('resultsView');
+        const textDisplay = document.getElementById('textDisplay');
+        const typingInput = document.getElementById('typingInput');
+        const resetButton = document.getElementById('resetButton');
+        const retryButton = document.getElementById('retryButton');
+        const newExerciseButton = document.getElementById('newExerciseButton');
+        const backButton = document.getElementById('backButton');
+        const progressBar = document.getElementById('progressBar');
+        const exerciseTitle = document.getElementById('exerciseTitle');
+        const exerciseDifficulty = document.getElementById('exerciseDifficulty');
+        const exerciseSource = document.getElementById('exerciseSource');
+        const wordCount = document.getElementById('wordCount');
+        const vocabularyList = document.getElementById('vocabularyList');
+        
+        // 统计元素
+        const wpmStat = document.getElementById('wpmStat');
+        const accuracyStat = document.getElementById('accuracyStat');
+        const timerStat = document.getElementById('timerStat');
+        const errorsStat = document.getElementById('errorsStat');
+        const finalWpm = document.getElementById('finalWpm');
+        const finalAccuracy = document.getElementById('finalAccuracy');
+        const finalTime = document.getElementById('finalTime');
+        const finalErrors = document.getElementById('finalErrors');
+        
+        // 导航元素
+        const navHome = document.getElementById('navHome');
+        const navPractice = document.getElementById('navPractice');
+        const navResults = document.getElementById('navResults');
+        
+        // 状态变量
+        let currentExercise = null;
+        let currentCategory = null;
+        let currentText = '';
+        let currentIndex = 0;
+        let errors = 0;
+        let startTime = null;
+        let timerInterval = null;
+        let totalChars = 0;
+        let correctChars = 0;
+        
+        // 初始化
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const category = card.dataset.category;
+                startPractice(category);
+            });
+        });
+        
+        // 开始练习
+        function startPractice(category) {
+            currentCategory = category;
+            
+            // 显示加载状态
+            textDisplay.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>正在加载练习内容...</p>
+                </div>
+            `;
+            
+            // 模拟异步加载
+            setTimeout(() => {
+                // 随机选择练习
+                const categoryExercises = exercises[category];
+                const randomIndex = Math.floor(Math.random() * categoryExercises.length);
+                currentExercise = categoryExercises[randomIndex];
+                currentText = currentExercise.text;
+                
+                // 更新UI
+                exerciseTitle.textContent = currentExercise.title;
+                exerciseDifficulty.textContent = currentExercise.difficulty;
+                exerciseSource.textContent = currentExercise.source;
+                
+                // 计算字数
+                const words = currentText.split(/\s+/).length;
+                wordCount.textContent = words;
+                
+                // 显示词汇表
+                if (currentExercise.vocabulary) {
+                    vocabularyList.textContent = currentExercise.vocabulary.join(', ');
+                } else {
+                    vocabularyList.textContent = "无重点词汇";
+                }
+                
+                // 渲染文本
+                renderText();
+                
+                // 重置状态
+                resetPractice();
+                
+                // 切换视图
+                categoryView.style.display = 'none';
+                practiceView.style.display = 'block';
+                resultsView.style.display = 'none';
+                
+                // 更新导航状态
+                updateNav('practice');
+                
+                // 聚焦输入框
+                setTimeout(() => typingInput.focus(), 100);
+            }, 800); // 模拟网络延迟
+        }
+        
+        // 渲染文本
+        function renderText() {
+            textDisplay.innerHTML = '';
+            totalChars = currentText.length;
+            
+            for (let i = 0; i < currentText.length; i++) {
+                const charSpan = document.createElement('span');
+                charSpan.classList.add('char');
+                charSpan.textContent = currentText[i];
+                textDisplay.appendChild(charSpan);
+            }
+            
+            // 设置当前字符
+            if (textDisplay.children.length > 0) {
+                textDisplay.children[0].classList.add('current');
+            }
+        }
+        
+        // 重置练习
+        function resetPractice() {
+            currentIndex = 0;
+            errors = 0;
+            correctChars = 0;
+            startTime = null;
+            
+            // 重置统计
+            wpmStat.textContent = '0';
+            accuracyStat.textContent = '100%';
+            timerStat.textContent = '00:00';
+            errorsStat.textContent = '0';
+            progressBar.style.width = '0%';
+            
+            // 重置输入
+            typingInput.value = '';
+            typingInput.disabled = false;
+            
+            // 清除定时器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // 重置文本样式
+            const charSpans = textDisplay.querySelectorAll('.char');
+            charSpans.forEach(span => {
+                span.classList.remove('correct', 'incorrect', 'current');
+            });
+            
+            // 设置当前字符
+            if (charSpans.length > 0) {
+                charSpans[0].classList.add('current');
+            }
+        }
+        
+        // 输入事件处理
+        typingInput.addEventListener('input', () => {
+            // 开始计时
+            if (startTime === null) {
+                startTime = new Date();
+                startTimer();
+            }
+            
+            const inputValue = typingInput.value;
+            const currentChar = currentText[currentIndex];
+            
+            // 处理删除
+            if (inputValue.length < typingInput.dataset.prevLength) {
+                handleBackspace();
+                typingInput.dataset.prevLength = inputValue.length;
+                return;
+            }
+            
+            const enteredChar = inputValue[inputValue.length - 1];
+            const charSpan = textDisplay.children[currentIndex];
+            
+            // 检查输入是否正确
+            if (enteredChar === currentChar) {
+                charSpan.classList.remove('current', 'incorrect');
+                charSpan.classList.add('correct');
+                correctChars++;
+            } else {
+                charSpan.classList.remove('current');
+                charSpan.classList.add('incorrect');
+                errors++;
+                errorsStat.textContent = errors;
+            }
+            
+            // 更新当前字符
+            charSpan.classList.remove('current');
+            currentIndex++;
+            
+            if (currentIndex < currentText.length) {
+                textDisplay.children[currentIndex].classList.add('current');
+            }
+            
+            // 更新进度条
+            const progress = (currentIndex / currentText.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // 计算速度和准确率
+            calculateStats();
+            
+            // 检查是否完成
+            if (currentIndex >= currentText.length) {
+                finishPractice();
+            }
+            
+            typingInput.dataset.prevLength = inputValue.length;
+        });
+        
+        // 处理退格键
+        function handleBackspace() {
+            if (currentIndex <= 0) return;
+            
+            currentIndex--;
+            const charSpan = textDisplay.children[currentIndex];
+            
+            // 如果之前标记为错误，减少错误计数
+            if (charSpan.classList.contains('incorrect')) {
+                errors--;
+                errorsStat.textContent = errors;
+            } 
+            // 如果之前标记为正确，减少正确计数
+            else if (charSpan.classList.contains('correct')) {
+                correctChars--;
+            }
+            
+            // 重置字符样式
+            charSpan.classList.remove('correct', 'incorrect');
+            charSpan.classList.add('current');
+            
+            // 移除下一个字符的当前标记
+            if (currentIndex + 1 < currentText.length) {
+                textDisplay.children[currentIndex + 1].classList.remove('current');
+            }
+            
+            // 更新进度条
+            const progress = (currentIndex / currentText.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // 重新计算统计
+            calculateStats();
+        }
+        
+        // 开始计时器
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const now = new Date();
+                const elapsedTime = Math.floor((now - startTime) / 1000); // 秒
+                const minutes = Math.floor(elapsedTime / 60);
+                const seconds = elapsedTime % 60;
+                
+                timerStat.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 每分钟更新一次WPM
+                if (seconds === 0) {
+                    calculateStats();
+                }
+            }, 1000);
+        }
+        
+        // 计算统计信息
+        function calculateStats() {
+            if (startTime === null) return;
+            
+            // 计算经过的时间（分钟）
+            const now = new Date();
+            const elapsedMinutes = (now - startTime) / (1000 * 60);
+            
+            // 计算WPM（每分钟词数）
+            // 假设平均每个单词5个字符
+            const wordsTyped = correctChars / 5;
+            const wpm = elapsedMinutes > 0 ? Math.floor(wordsTyped / elapsedMinutes) : 0;
+            wpmStat.textContent = wpm;
+            
+            // 计算准确率
+            const accuracy = currentIndex > 0 ? Math.floor((correctChars / currentIndex) * 100) : 100;
+            accuracyStat.textContent = `${accuracy}%`;
+            
+            return { wpm, accuracy };
+        }
+        
+        // 完成练习
+        function finishPractice() {
+            // 停止计时器
+            clearInterval(timerInterval);
+            
+            // 禁用输入
+            typingInput.disabled = true;
+            
+            // 计算最终统计
+            const now = new Date();
+            const elapsedTime = Math.floor((now - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const stats = calculateStats();
+            const accuracy = currentIndex > 0 ? Math.floor((correctChars / currentIndex) * 100) : 100;
+            
+            // 更新结果视图
+            finalWpm.textContent = stats.wpm || 0;
+            finalAccuracy.textContent = `${accuracy}%`;
+            finalTime.textContent = formattedTime;
+            finalErrors.textContent = errors;
+            
+            // 显示结果视图
+            practiceView.style.display = 'none';
+            resultsView.style.display = 'block';
+            
+            // 更新导航状态
+            updateNav('results');
+        }
+        
+        // 重置按钮
+        resetButton.addEventListener('click', resetPractice);
+        
+        // 重试按钮
+        retryButton.addEventListener('click', () => {
+            resetPractice();
+            practiceView.style.display = 'block';
+            resultsView.style.display = 'none';
+            updateNav('practice');
+            typingInput.focus();
+        });
+        
+        // 新练习按钮
+        newExerciseButton.addEventListener('click', () => {
+            startPractice(currentCategory);
+        });
+        
+        // 返回按钮
+        backButton.addEventListener('click', () => {
+            categoryView.style.display = 'block';
+            resultsView.style.display = 'none';
+            updateNav('home');
+        });
+        
+        // 导航处理
+        navHome.addEventListener('click', (e) => {
+            e.preventDefault();
+            categoryView.style.display = 'block';
+            practiceView.style.display = 'none';
+            resultsView.style.display = 'none';
+            updateNav('home');
+        });
+        
+        navPractice.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentCategory) {
+                categoryView.style.display = 'none';
+                practiceView.style.display = 'block';
+                resultsView.style.display = 'none';
+                updateNav('practice');
+                typingInput.focus();
+            }
+        });
+        
+        navResults.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentCategory && currentIndex > 0) {
+                categoryView.style.display = 'none';
+                practiceView.style.display = 'none';
+                resultsView.style.display = 'block';
+                updateNav('results');
+            }
+        });
+        
+        // 更新导航状态
+        function updateNav(active) {
+            navHome.classList.toggle('active', active === 'home');
+            navPractice.classList.toggle('active', active === 'practice');
+            navResults.classList.toggle('active', active === 'results');
+        }
+        
+        // 初始化
+        document.addEventListener('keydown', (e) => {
+            // 忽略功能键
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+            
+            // 阻止在输入框中的默认行为
+            if (e.target !== typingInput && !e.target.isContentEditable) {
+                typingInput.focus();
+                e.preventDefault();
+            }
+        });
+        
+        // 设置初始导航状态
+        updateNav('home');
+    </script>
+</body>
+</html>
