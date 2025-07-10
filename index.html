@@ -29,6 +29,7 @@
             --card-bg: rgba(30, 30, 30, 0.9);
             --transition: all 0.3s ease;
             --accent: #3498db;
+            --select-bg: rgba(40, 40, 40, 0.8);
         }
         
         body {
@@ -167,6 +168,77 @@
             font-size: 0.95rem;
         }
         
+        .exercise-list-view {
+            width: 100%;
+            max-width: 900px;
+            display: none;
+        }
+        
+        .exercise-list-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--text-correct);
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .exercise-list-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .exercise-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .exercise-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .exercise-list::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+        
+        .exercise-list::-webkit-scrollbar-thumb {
+            background: var(--text-correct);
+            border-radius: 4px;
+        }
+        
+        .exercise-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .exercise-item:hover {
+            background: rgba(40, 40, 40, 0.8);
+            transform: translateX(5px);
+            border-left-color: var(--text-correct);
+        }
+        
+        .exercise-item h4 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .exercise-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
         .practice-view {
             width: 100%;
             max-width: 900px;
@@ -217,10 +289,18 @@
             line-height: 1.8;
             margin-bottom: 30px;
             min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
             padding: 20px;
             background: rgba(40,40,40,0.4);
             border-radius: 8px;
             overflow-wrap: break-word;
+            position: relative;
+        }
+        
+        .text-display:focus {
+            outline: 2px solid var(--text-correct);
+            outline-offset: 2px;
         }
         
         .char {
@@ -240,29 +320,19 @@
         .char.current {
             background-color: rgba(226, 183, 20, 0.2);
             border-radius: 3px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { background-color: rgba(226, 183, 20, 0.2); }
+            50% { background-color: rgba(226, 183, 20, 0.4); }
+            100% { background-color: rgba(226, 183, 20, 0.2); }
         }
         
         .input-area {
             display: flex;
             gap: 15px;
             align-items: center;
-        }
-        
-        #typingInput {
-            flex: 1;
-            padding: 15px 20px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            outline: none;
-            transition: var(--transition);
-        }
-        
-        #typingInput:focus {
-            border-color: var(--text-correct);
-            box-shadow: 0 0 0 3px rgba(226, 183, 20, 0.3);
         }
         
         .action-button {
@@ -293,6 +363,14 @@
         
         .action-button.reset:hover {
             background: #c0392b;
+        }
+        
+        .action-button.finish {
+            background: var(--warning);
+        }
+        
+        .action-button.finish:hover {
+            background: #d35400;
         }
         
         .results-view {
@@ -455,71 +533,23 @@
             border-left: 4px solid var(--error);
         }
         
-        .deployment-guide {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 40px;
-            max-width: 900px;
-            width: 100%;
-        }
-        
-        .deployment-guide h2 {
-            color: var(--text-correct);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .deployment-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .step {
+        .back-button {
             background: var(--bg-secondary);
-            padding: 15px;
+            color: var(--text-primary);
+            border: none;
             border-radius: 8px;
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .step-number {
+        .back-button:hover {
             background: var(--text-correct);
             color: var(--bg-primary);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-        
-        .json-structure {
-            background: var(--bg-secondary);
-            padding: 20px;
-            border-radius: 8px;
-            font-family: monospace;
-            overflow-x: auto;
-            margin-top: 20px;
-            font-size: 0.9rem;
-        }
-        
-        .json-key {
-            color: var(--text-correct);
-        }
-        
-        .json-string {
-            color: var(--success);
-        }
-        
-        .json-comment {
-            color: var(--text-secondary);
-            font-style: italic;
         }
         
         @media (max-width: 768px) {
@@ -543,10 +573,6 @@
                 flex-direction: column;
             }
             
-            #typingInput {
-                width: 100%;
-            }
-            
             .action-button {
                 width: 100%;
                 justify-content: center;
@@ -561,6 +587,11 @@
             nav ul {
                 width: 100%;
                 justify-content: center;
+            }
+            
+            .exercise-meta {
+                flex-direction: column;
+                gap: 5px;
             }
         }
     </style>
@@ -626,63 +657,19 @@
                 
                 <div class="hint">
                     <i class="fas fa-lightbulb"></i>
-                    提示：选择类别后，系统将随机加载该类别下的文章。开始输入时计时器会自动启动。
+                    提示：选择类别后，系统将显示该类别下的文章列表。选择文章后即可开始练习。
                 </div>
+            </div>
+            
+            <div class="exercise-list-view" id="exerciseListView">
+                <button class="back-button" id="backToCategories">
+                    <i class="fas fa-arrow-left"></i> 返回类别选择
+                </button>
+                <h2 class="exercise-list-title" id="listTitle">听力练习文章</h2>
                 
-                <div class="deployment-guide">
-                    <h2><i class="fas fa-rocket"></i> GitHub部署指南</h2>
-                    
-                    <div class="deployment-steps">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div>
-                                <strong>创建GitHub仓库</strong>
-                                <p>登录GitHub → 点击"New repository" → 命名为"toefl-typing-practice" → 选择Public → 添加README文件</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step">
-                            <div class="step-number">2</div>
-                            <div>
-                                <strong>上传文件</strong>
-                                <p>克隆仓库 → 添加index.html文件 → 创建data目录 → 添加JSON练习文件 → 提交并推送更改</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div>
-                                <strong>启用GitHub Pages</strong>
-                                <p>仓库设置 → Pages → 选择main分支 → 保存后访问 https://&lt;用户名&gt;.github.io/toefl-typing-practice</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <h3>JSON练习文件格式</h3>
-                    <div class="json-structure">
-                        <span class="json-key">[</span><br>
-                        &nbsp;&nbsp;<span class="json-key">{</span><br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id":</span> <span class="json-string">"listening-001"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"title":</span> <span class="json-string">"生物学讲座"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"text":</span> <span class="json-string">"Today we'll discuss photosynthesis..."</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"difficulty":</span> <span class="json-string">"中级"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"source":</span> <span class="json-string">"TOEFL Listening Practice"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"vocabulary":</span> [<span class="json-string">"photosynthesis"</span>, <span class="json-string">"chloroplasts"</span>]<br>
-                        &nbsp;&nbsp;<span class="json-key">}</span>,<br>
-                        &nbsp;&nbsp;<span class="json-key">{</span><br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"id":</span> <span class="json-string">"listening-002"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"title":</span> <span class="json-string">"艺术史讲座"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"text":</span> <span class="json-string">"The Renaissance period marked..."</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"difficulty":</span> <span class="json-string">"高级"</span>,<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="json-key">"source":</span> <span class="json-string">"TOEFL Listening Practice"</span><br>
-                        &nbsp;&nbsp;<span class="json-key">}</span><br>
-                        <span class="json-key">]</span><br>
-                        <span class="json-comment">// 每个JSON文件可包含多个练习文章</span>
-                    </div>
-                    
-                    <div class="hint">
-                        <i class="fas fa-folder-open"></i>
-                        目录结构: toefl-typing-practice/index.html 和 toefl-typing-practice/data/[category].json
+                <div class="exercise-list-container">
+                    <div class="exercise-list" id="exerciseList">
+                        <!-- 文章列表将通过JavaScript动态生成 -->
                     </div>
                 </div>
             </div>
@@ -715,14 +702,16 @@
                 </div>
                 
                 <div class="typing-container">
-                    <div class="text-display" id="textDisplay">
+                    <div class="text-display" id="textDisplay" tabindex="0">
                         <!-- 文章内容将通过JavaScript动态生成 -->
                     </div>
                     
                     <div class="input-area">
-                        <input type="text" id="typingInput" placeholder="点击此处开始输入..." autocomplete="off">
                         <button class="action-button reset" id="resetButton">
                             <i class="fas fa-redo"></i> 重置
+                        </button>
+                        <button class="action-button finish" id="finishButton">
+                            <i class="fas fa-flag-checkered"></i> 结束
                         </button>
                     </div>
                 </div>
@@ -769,7 +758,7 @@
                     <button class="action-button" id="newExerciseButton">
                         <i class="fas fa-random"></i> 新练习
                     </button>
-                    <button class="action-button" id="backButton">
+                    <button class="action-button" id="backToCategoryButton">
                         <i class="fas fa-arrow-left"></i> 返回
                     </button>
                 </div>
@@ -779,103 +768,31 @@
     
     <footer>
         <div class="container">
-            <p>TOEFL 打字练习系统 &copy; 2023 | 提升您的英语打字速度和准确率 | 设计用于GitHub Pages部署</p>
+            <p>TOEFL 打字练习系统 &copy; 2023 | 提升您的英语打字速度和准确率</p>
         </div>
     </footer>
     
     <script>
-        // 模拟从JSON加载的练习数据
-        const exercises = {
-            listening: [
-                {
-                    id: "listening-001",
-                    title: "生物学讲座",
-                    text: "Today we'll discuss photosynthesis, the process by which plants convert light energy into chemical energy. This complex biochemical process occurs in the chloroplasts of plant cells and involves two main stages: the light-dependent reactions and the Calvin cycle. Photosynthesis not only provides energy for the plant itself but also produces oxygen as a byproduct, which is essential for most living organisms on Earth.",
-                    difficulty: "中级",
-                    source: "TOEFL Listening Practice",
-                    vocabulary: ["photosynthesis", "chloroplasts", "biochemical", "Calvin cycle"]
-                },
-                {
-                    id: "listening-002",
-                    title: "艺术史讲座",
-                    text: "The Renaissance period marked a significant shift in European art and culture. Beginning in Italy during the 14th century, this movement emphasized humanism, realism, and classical influences. Artists like Leonardo da Vinci and Michelangelo created masterpieces that demonstrated remarkable technical skill and deep understanding of human anatomy. The invention of linear perspective during this time revolutionized how artists represented three-dimensional space on a two-dimensional surface.",
-                    difficulty: "高级",
-                    source: "TOEFL Listening Practice",
-                    vocabulary: ["Renaissance", "humanism", "anatomy", "perspective"]
-                }
-            ],
-            reading: [
-                {
-                    id: "reading-001",
-                    title: "气候变化的科学",
-                    text: "Climate change represents one of the most pressing environmental challenges of our time. Scientific evidence overwhelmingly indicates that Earth's climate is warming at an unprecedented rate, primarily due to human activities such as burning fossil fuels and deforestation. This warming leads to rising sea levels, more extreme weather events, and disruptions to ecosystems worldwide. Addressing climate change requires global cooperation and innovative solutions across multiple sectors.",
-                    difficulty: "高级",
-                    source: "TOEFL Reading Passage",
-                    vocabulary: ["unprecedented", "deforestation", "ecosystems", "innovation"]
-                },
-                {
-                    id: "reading-002",
-                    title: "蜜蜂的重要性",
-                    text: "Bees play a crucial role in global food production through pollination. Approximately one-third of the food we consume depends on pollination by bees and other insects. However, bee populations worldwide are declining due to factors including pesticide use, habitat loss, and climate change. This decline threatens agricultural productivity and biodiversity. Conservation efforts are essential to protect these vital pollinators and maintain ecosystem balance.",
-                    difficulty: "中级",
-                    source: "TOEFL Reading Passage",
-                    vocabulary: ["pollination", "pesticide", "biodiversity", "ecosystem"]
-                }
-            ],
-            speaking: [
-                {
-                    id: "speaking-001",
-                    title: "独立口语任务",
-                    text: "Some people believe that technology has made our lives easier and more convenient. Others argue that technology has created more problems than it has solved. Which view do you agree with? Use specific reasons and examples to support your answer. Personally, I believe technology has significantly improved our quality of life despite some challenges it presents.",
-                    difficulty: "中级",
-                    source: "TOEFL Speaking Task 2",
-                    vocabulary: ["technology", "convenience", "challenges", "innovation"]
-                },
-                {
-                    id: "speaking-002",
-                    title: "校园公告讨论",
-                    text: "The university has announced plans to replace all physical textbooks with digital versions within two years. The announcement states that this change will reduce costs for students and make learning materials more accessible. However, some students have expressed concerns about eye strain from prolonged screen time and potential technical issues. What is your opinion on this matter?",
-                    difficulty: "高级",
-                    source: "TOEFL Speaking Task 3",
-                    vocabulary: ["digital", "accessible", "technical", "prolonged"]
-                }
-            ],
-            writing: [
-                {
-                    id: "writing-001",
-                    title: "综合写作任务",
-                    text: "The reading passage discusses the potential benefits of vertical farming as a solution to food production challenges in urban areas. It claims that vertical farms use less water and land than traditional agriculture while reducing transportation costs. The lecture, however, challenges these arguments by pointing out the high energy consumption of artificial lighting and climate control systems required for vertical farms. Furthermore, the professor questions whether vertical farming can realistically produce staple crops in sufficient quantities to feed large urban populations.",
-                    difficulty: "高级",
-                    source: "TOEFL Writing Task 1",
-                    vocabulary: ["vertical farming", "agriculture", "consumption", "staple crops"]
-                },
-                {
-                    id: "writing-002",
-                    title: "教育观点讨论",
-                    text: "Do you agree or disagree with the following statement? The most important aspect of a job is the money a person earns. Use specific reasons and examples to support your answer. While financial compensation is undoubtedly important, I believe job satisfaction and work-life balance contribute more significantly to overall career fulfillment. People who find meaning in their work tend to be more productive and experience better mental health, regardless of their salary level.",
-                    difficulty: "中级",
-                    source: "TOEFL Writing Task 2",
-                    vocabulary: ["compensation", "fulfillment", "productive", "regardless"]
-                }
-            ]
-        };
-        
         // DOM元素
         const categoryView = document.getElementById('categoryView');
+        const exerciseListView = document.getElementById('exerciseListView');
         const practiceView = document.getElementById('practiceView');
         const resultsView = document.getElementById('resultsView');
         const textDisplay = document.getElementById('textDisplay');
-        const typingInput = document.getElementById('typingInput');
         const resetButton = document.getElementById('resetButton');
+        const finishButton = document.getElementById('finishButton');
         const retryButton = document.getElementById('retryButton');
         const newExerciseButton = document.getElementById('newExerciseButton');
-        const backButton = document.getElementById('backButton');
+        const backToCategoryButton = document.getElementById('backToCategoryButton');
+        const backToCategories = document.getElementById('backToCategories');
         const progressBar = document.getElementById('progressBar');
         const exerciseTitle = document.getElementById('exerciseTitle');
         const exerciseDifficulty = document.getElementById('exerciseDifficulty');
         const exerciseSource = document.getElementById('exerciseSource');
         const wordCount = document.getElementById('wordCount');
         const vocabularyList = document.getElementById('vocabularyList');
+        const exerciseList = document.getElementById('exerciseList');
+        const listTitle = document.getElementById('listTitle');
         
         // 统计元素
         const wpmStat = document.getElementById('wpmStat');
@@ -895,6 +812,7 @@
         // 状态变量
         let currentExercise = null;
         let currentCategory = null;
+        let currentExercises = [];
         let currentText = '';
         let currentIndex = 0;
         let errors = 0;
@@ -902,70 +820,151 @@
         let timerInterval = null;
         let totalChars = 0;
         let correctChars = 0;
-        
+        let scrollInterval = null;
+
         // 初始化
         document.querySelectorAll('.category-card').forEach(card => {
             card.addEventListener('click', () => {
                 const category = card.dataset.category;
-                startPractice(category);
+                loadExercises(category);
             });
         });
         
-        // 开始练习
-        function startPractice(category) {
+        // 加载练习数据
+        function loadExercises(category) {
             currentCategory = category;
             
+            // 更新列表标题
+            listTitle.textContent = getCategoryName(category) + '文章';
+            
             // 显示加载状态
-            textDisplay.innerHTML = `
+            exerciseList.innerHTML = `
                 <div class="loading">
                     <div class="loading-spinner">
                         <i class="fas fa-spinner fa-spin"></i>
                     </div>
-                    <p>正在加载练习内容...</p>
+                    <p>正在加载文章列表...</p>
                 </div>
             `;
             
-            // 模拟异步加载
-            setTimeout(() => {
-                // 随机选择练习
-                const categoryExercises = exercises[category];
-                const randomIndex = Math.floor(Math.random() * categoryExercises.length);
-                currentExercise = categoryExercises[randomIndex];
-                currentText = currentExercise.text;
-                
-                // 更新UI
-                exerciseTitle.textContent = currentExercise.title;
-                exerciseDifficulty.textContent = currentExercise.difficulty;
-                exerciseSource.textContent = currentExercise.source;
+            // 显示文章列表视图
+            categoryView.style.display = 'none';
+            exerciseListView.style.display = 'block';
+            practiceView.style.display = 'none';
+            resultsView.style.display = 'none';
+            updateNav('practice');
+            
+            // 从JSON文件加载练习数据
+            fetch(`data/${category}.json`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('网络响应不正常');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    currentExercises = data;
+                    renderExerciseList();
+                })
+                .catch(error => {
+                    console.error('加载练习数据失败:', error);
+                    exerciseList.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>无法加载练习数据: ${error.message}</p>
+                            <p>请检查JSON文件路径是否正确</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // 获取类别名称
+        function getCategoryName(category) {
+            const names = {
+                'listening': '听力',
+                'reading': '阅读',
+                'speaking': '口语',
+                'writing': '写作'
+            };
+            return names[category] || category;
+        }
+        
+        // 渲染文章列表
+        function renderExerciseList() {
+            exerciseList.innerHTML = '';
+            
+            if (currentExercises.length === 0) {
+                exerciseList.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>该类别下没有可用的练习文章</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentExercises.forEach(exercise => {
+                const exerciseItem = document.createElement('div');
+                exerciseItem.classList.add('exercise-item');
+                exerciseItem.dataset.id = exercise.id;
                 
                 // 计算字数
-                const words = currentText.split(/\s+/).length;
-                wordCount.textContent = words;
+                const words = exercise.text.split(/\s+/).length;
                 
-                // 显示词汇表
-                if (currentExercise.vocabulary) {
-                    vocabularyList.textContent = currentExercise.vocabulary.join(', ');
-                } else {
-                    vocabularyList.textContent = "无重点词汇";
-                }
+                exerciseItem.innerHTML = `
+                    <h4>${exercise.title}</h4>
+                    <div class="exercise-meta">
+                        <span>难度: ${exercise.difficulty}</span>
+                        <span>字数: ${words} 词</span>
+                        <span>来源: ${exercise.source}</span>
+                    </div>
+                `;
                 
-                // 渲染文本
-                renderText();
+                exerciseItem.addEventListener('click', () => {
+                    startPractice(exercise);
+                });
                 
-                // 重置状态
-                resetPractice();
-                
-                // 切换视图
-                categoryView.style.display = 'none';
-                practiceView.style.display = 'block';
-                resultsView.style.display = 'none';
-                
-                // 更新导航状态
-                updateNav('practice');
-                
-                // 聚焦输入框
-                setTimeout(() => typingInput.focus(), 100);
-            }, 800); // 模拟网络延迟
+                exerciseList.appendChild(exerciseItem);
+            });
+        }
+        
+        // 开始练习
+        function startPractice(exercise) {
+            currentExercise = exercise;
+            currentText = currentExercise.text;
+            
+            // 更新UI
+            exerciseTitle.textContent = currentExercise.title;
+            exerciseDifficulty.textContent = currentExercise.difficulty;
+            exerciseSource.textContent = currentExercise.source;
+            
+            // 计算字数
+            const words = currentText.split(/\s+/).length;
+            wordCount.textContent = words;
+            
+            // 显示词汇表
+            if (currentExercise.vocabulary) {
+                vocabularyList.textContent = currentExercise.vocabulary.join(', ');
+            } else {
+                vocabularyList.textContent = "无重点词汇";
+            }
+            
+            // 渲染文本
+            renderText();
+            
+            // 重置状态
+            resetPractice();
+            
+            // 切换视图
+            exerciseListView.style.display = 'none';
+            practiceView.style.display = 'block';
+            resultsView.style.display = 'none';
+            
+            // 更新导航状态
+            updateNav('practice');
+            
+            // 聚焦文本显示区域
+            setTimeout(() => textDisplay.focus(), 100);
         }
         
         // 渲染文本
@@ -1000,10 +999,6 @@
             errorsStat.textContent = '0';
             progressBar.style.width = '0%';
             
-            // 重置输入
-            typingInput.value = '';
-            typingInput.disabled = false;
-            
             // 清除定时器
             if (timerInterval) {
                 clearInterval(timerInterval);
@@ -1020,62 +1015,90 @@
             if (charSpans.length > 0) {
                 charSpans[0].classList.add('current');
             }
+            
+            // 开始自动滚动
+            startAutoScroll();
         }
         
-        // 输入事件处理
-        typingInput.addEventListener('input', () => {
+        // 开始自动滚动（确保当前字符可见）
+        function startAutoScroll() {
+            if (scrollInterval) {
+                clearInterval(scrollInterval);
+            }
+            
+            scrollInterval = setInterval(() => {
+                if (textDisplay.children[currentIndex]) {
+                    textDisplay.children[currentIndex].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                }
+            }, 100);
+        }
+        
+        // 处理键盘输入
+        textDisplay.addEventListener('keydown', (e) => {
+            // 阻止默认行为
+            e.preventDefault();
+            
+            // 忽略功能键
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+            
             // 开始计时
             if (startTime === null) {
                 startTime = new Date();
                 startTimer();
             }
             
-            const inputValue = typingInput.value;
-            const currentChar = currentText[currentIndex];
-            
-            // 处理删除
-            if (inputValue.length < typingInput.dataset.prevLength) {
-                handleBackspace();
-                typingInput.dataset.prevLength = inputValue.length;
+            // 处理退格键
+            if (e.key === 'Backspace') {
+                if (currentIndex > 0) {
+                    handleBackspace();
+                }
                 return;
             }
             
-            const enteredChar = inputValue[inputValue.length - 1];
-            const charSpan = textDisplay.children[currentIndex];
+            // 忽略长按键
+            if (e.repeat) return;
             
-            // 检查输入是否正确
-            if (enteredChar === currentChar) {
-                charSpan.classList.remove('current', 'incorrect');
-                charSpan.classList.add('correct');
-                correctChars++;
-            } else {
+            // 处理普通字符
+            if (e.key.length === 1) {
+                const currentChar = currentText[currentIndex];
+                const charSpan = textDisplay.children[currentIndex];
+                
+                // 检查输入是否正确
+                if (e.key === currentChar) {
+                    charSpan.classList.remove('current', 'incorrect');
+                    charSpan.classList.add('correct');
+                    correctChars++;
+                } else {
+                    charSpan.classList.remove('current');
+                    charSpan.classList.add('incorrect');
+                    errors++;
+                    errorsStat.textContent = errors;
+                }
+                
+                // 更新当前字符
                 charSpan.classList.remove('current');
-                charSpan.classList.add('incorrect');
-                errors++;
-                errorsStat.textContent = errors;
+                currentIndex++;
+                
+                if (currentIndex < currentText.length) {
+                    textDisplay.children[currentIndex].classList.add('current');
+                }
+                
+                // 更新进度条
+                const progress = (currentIndex / currentText.length) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                // 计算速度和准确率
+                calculateStats();
+                
+                // 检查是否完成
+                if (currentIndex >= currentText.length) {
+                    finishPractice();
+                }
             }
-            
-            // 更新当前字符
-            charSpan.classList.remove('current');
-            currentIndex++;
-            
-            if (currentIndex < currentText.length) {
-                textDisplay.children[currentIndex].classList.add('current');
-            }
-            
-            // 更新进度条
-            const progress = (currentIndex / currentText.length) * 100;
-            progressBar.style.width = `${progress}%`;
-            
-            // 计算速度和准确率
-            calculateStats();
-            
-            // 检查是否完成
-            if (currentIndex >= currentText.length) {
-                finishPractice();
-            }
-            
-            typingInput.dataset.prevLength = inputValue.length;
         });
         
         // 处理退格键
@@ -1154,9 +1177,7 @@
         function finishPractice() {
             // 停止计时器
             clearInterval(timerInterval);
-            
-            // 禁用输入
-            typingInput.disabled = true;
+            clearInterval(scrollInterval);
             
             // 计算最终统计
             const now = new Date();
@@ -1185,31 +1206,50 @@
         // 重置按钮
         resetButton.addEventListener('click', resetPractice);
         
+        // 结束练习按钮
+        finishButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                finishPractice();
+            } else {
+                alert("请至少输入一些内容再结束练习");
+            }
+        });
+        
         // 重试按钮
         retryButton.addEventListener('click', () => {
             resetPractice();
             practiceView.style.display = 'block';
             resultsView.style.display = 'none';
             updateNav('practice');
-            typingInput.focus();
+            textDisplay.focus();
         });
         
         // 新练习按钮
         newExerciseButton.addEventListener('click', () => {
-            startPractice(currentCategory);
+            exerciseListView.style.display = 'block';
+            resultsView.style.display = 'none';
+            updateNav('practice');
         });
         
-        // 返回按钮
-        backButton.addEventListener('click', () => {
+        // 返回类别按钮
+        backToCategories.addEventListener('click', () => {
             categoryView.style.display = 'block';
-            resultsView.style.display = 'none';
+            exerciseListView.style.display = 'none';
             updateNav('home');
+        });
+        
+        // 返回类别按钮（结果页面）
+        backToCategoryButton.addEventListener('click', () => {
+            exerciseListView.style.display = 'block';
+            resultsView.style.display = 'none';
+            updateNav('practice');
         });
         
         // 导航处理
         navHome.addEventListener('click', (e) => {
             e.preventDefault();
             categoryView.style.display = 'block';
+            exerciseListView.style.display = 'none';
             practiceView.style.display = 'none';
             resultsView.style.display = 'none';
             updateNav('home');
@@ -1218,11 +1258,19 @@
         navPractice.addEventListener('click', (e) => {
             e.preventDefault();
             if (currentCategory) {
-                categoryView.style.display = 'none';
-                practiceView.style.display = 'block';
-                resultsView.style.display = 'none';
+                if (currentExercise) {
+                    categoryView.style.display = 'none';
+                    exerciseListView.style.display = 'none';
+                    practiceView.style.display = 'block';
+                    resultsView.style.display = 'none';
+                    textDisplay.focus();
+                } else {
+                    categoryView.style.display = 'none';
+                    exerciseListView.style.display = 'block';
+                    practiceView.style.display = 'none';
+                    resultsView.style.display = 'none';
+                }
                 updateNav('practice');
-                typingInput.focus();
             }
         });
         
@@ -1230,6 +1278,7 @@
             e.preventDefault();
             if (currentCategory && currentIndex > 0) {
                 categoryView.style.display = 'none';
+                exerciseListView.style.display = 'none';
                 practiceView.style.display = 'none';
                 resultsView.style.display = 'block';
                 updateNav('results');
@@ -1249,8 +1298,8 @@
             if (e.ctrlKey || e.altKey || e.metaKey) return;
             
             // 阻止在输入框中的默认行为
-            if (e.target !== typingInput && !e.target.isContentEditable) {
-                typingInput.focus();
+            if (e.target !== textDisplay && !e.target.isContentEditable) {
+                textDisplay.focus();
                 e.preventDefault();
             }
         });
